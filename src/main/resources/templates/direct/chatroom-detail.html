@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{template::head(title='TheStargram :: Direct')}">
+</head>
+<body>
+	<div class=" d-flex" style="padding: 0px; height: 911px">
+		<!-- 사이드바 고정 -->
+		<div th:replace="~{direct/inbox::sidebar}"></div>
+		<!-- 채팅방 sidebar -->
+		<div th:replace="~{direct/inbox::chatlist}" ></div>
+		<!-- 채팅내용 -->
+		<div class="d-flex flex-column flex-fill" th:data-account-id="${account.id}" id="chat">
+			<div class="sticky-top" style="height: 75px; border-bottom: 1px solid rgb(219,219,219)" id="room" th:data-room-id="${chatroom.chatroom.id}">
+				<div class="d-flex justify-content-start align-items-center gap-3 mt-3" style="padding-left: 16px;padding-right: 16px">
+					<div class="rounded-circle" style="width: 44px; height: 44px">
+						<img th:alt="친구프사" th:src="@{${chatroom.profileImageUrl}}" class="rounded-circle"  style="width: 44px; height: 44px; overflow: hidden;">
+					</div>
+					<div th:text="${chatroom.username}" style="font-size: 18px;"></div>
+				</div>
+			</div>
+			<!-- 채팅내용 -->
+			<div class="mt-3" style="overflow-y: scroll; flex:1; padding-left: 20px; padding-right: 20px" id="messages">
+				<!-- 메세지 반복문 -->
+				<th:block th:each="one : ${message}">
+					
+						<th:block th:if="${account.id == one.account.id}">
+							<div th:id="${one.id}" class="text-end mb-2 mt-2" >
+								<span th:text="|(${#temporals.format(one.sentAt,'HH:mm')})|"
+								class="text-secondary" style="font-size: 10px"></span>
+								<span class="rounded-2" th:text="${one.content}" style="background-color: rgb(55, 151, 240); color: white; padding: 6px; display: inline-block;"></span>
+							</div>
+						</th:block>
+						<th:block th:unless="${account.id == one.account.id}">
+							<div th:id="${one.id}" class="text-start mb-2 mt-2">
+								<span class="rounded-2" th:text="${one.content}" style="background-color: rgb(239, 239, 239); padding: 6px; display: inline-block;"></span>
+								<span th:text="|(${#temporals.format(one.sentAt,'HH:mm')})|" class="text-secondary" style="font-size: 10px"></span>
+							</div>
+						</th:block>
+				
+				</th:block>
+			</div>
+			<!-- 채팅입력 -->
+			<div class="p-3">
+				<input class="form-control" type="text" id="msg" th:data-room-id="${chatroom.chatroom.id}"/>
+			</div>
+		</div>
+	</div>
+	<!-- 검색 -->
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="search" aria-labelledby="search">
+      <div class="offcanvas-header" style="padding-bottom: 0px">
+        <div class="offcanvas-title" id="search" style="font-weight: bold; font-size: 25px">검색</div>
+      </div>
+      <div class="offcanvas-body">
+        <form class="d-flex mt-3" >
+          <input class="form-control me-2" type="search" placeholder="검색" >
+          <button class="btn btn-outline-success" type="submit">#</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- 알람 -->
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="alarm" aria-labelledby="alarm">
+      <div class="offcanvas-header" style="padding-bottom: 0px">
+        <div class="offcanvas-title" id="alarm" style="font-weight: bold; font-size: 25px">알림</div>
+      </div>
+      <div class="offcanvas-body">
+      	<ul>
+      		<li>여기다가</li>
+      		<li>알림을</li>
+      		<li>나열해주면</li>
+      		<li>되겠군?</li>
+      	</ul>
+      </div>
+    </div>
+    
+   <!-- 만들기 Modal -->
+	<form th:action="@{/add/post}" method="post" enctype="multipart/form-data" id="form">
+	<div class="modal fade" id="addPost" tabindex="-1" aria-labelledby="addPost" aria-hidden="true">
+	  <div class="modal-dialog modal-lg modal-dialog-centered">
+	    <div class="modal-content">
+	      <div class="modal-header d-flex justify-content-between align-items-center" style="padding: 10px">
+	        <div class="modal-title fs-6" id="exampleModalLabel" style="font-weight: bold; margin: auto">새 게시물 만들기</div>
+	        <div class="d-flex justify-content-end gap-3 ">
+	        	<div th:text="공유하기" style="font-size: 15px; font-weight: bold; color: blue; cursor: pointer;" 
+	        								onclick="document.querySelector('#form').submit();"></div>
+	        	<div>
+	        		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modalClose"></button>
+	      		</div>
+	      	</div>
+	      </div>
+	      <div class="modal-body row g-1" style="max-width: 100%; height: 420px; padding: 0px">
+	      
+	      	<div class="col d-flex flex-column gap-3" style="border-right: 1px solid #C7C8CC; max-width: 400px">      		
+	      		<div class="d-flex"  id="imageView" style="overflow-x: auto; padding-left: 10px"> 		
+		      		
+		      		<div style="cursor: pointer; width: 85px">
+		      			<img alt="사진추가" th:src="@{/static/nav/사진추가.png}" style="width: 85px; height: 85px; cursor: pointer;"
+		      						 onclick="document.querySelector('#image').click();">
+	      				<input type="file" name="images" id="image" style="display: none" multiple="multiple"/>
+		      		</div>
+	      		
+	      		</div>	
+	      		<!-- 여기는 캐러쉘!! -->      
+	      		<div id="addPostCarousel" class="carousel slide" style="height: 302px">
+					  <div class="carousel-inner" id="carouselView" style=" max-height: 302px">
+					    
+					  </div>
+					  <button class="carousel-control-prev" type="button" data-bs-target="#addPostCarousel" data-bs-slide="prev">
+					    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+					    <span class="visually-hidden">Previous</span>
+					  </button>
+					  <button class="carousel-control-next" type="button" data-bs-target="#addPostCarousel" data-bs-slide="next">
+					    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+					    <span class="visually-hidden">Next</span>
+					  </button>
+				</div>
+		      </div>
+	      	
+	      	<div class="col"  style="min-width: 40%">
+	      		<div class="d-flex justify-content-start align-items-center gap-3 mt-2 ms-2">
+		      		<div class="rounded-circle" style="overflow: hidden">
+		      			<img alt="프로필사진" th:src="@{${profile}}" style="width: 25px; height: 25px">
+		      		</div>
+		      		<!--  -->
+		      		
+	      			<div th:text="${account.username}" style="font-size: 14px; font-weight: bold;"></div>
+	      		</div>
+	      		<div class="mt-3 ms-2">
+	      			<textarea rows="13" cols="45" th:placeholder="|문구를 입력하세요...|" style="outline: none; max-width: 100%; min-width: 50%" 
+	      					class="content" id="content" maxlength="300" name="content"></textarea>
+	      		</div>
+	      		<div style="float: right; color: #B4B4B3">
+	      			<span id="textLengthCheck">0</span>/300
+	      		</div>
+	      	</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	</form>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+
+<script>
+	const fileState = [];
+	// 사진 미리보기
+	document.querySelector("#image").onchange = function(e){
+		const files = [...document.querySelector("#image").files]
+		
+		files.forEach(function(file, index){
+			const fileReader = new FileReader();
+			
+			fileReader.readAsDataURL(file);
+			fileReader.onload = function(e){
+				
+				const div = document.createElement("div");
+				div.className = "p-1 col rounded position-relative";
+				div.style.maxWidth = "85px";
+				
+				const div2 = document.createElement("div");
+				if(index === 0){
+					div2.className = "carousel-item active";			
+				}else{
+					div2.className = "carousel-item";
+				}
+				
+				const img = document.createElement("img");
+				img.src = e.target.result;
+				img.width = 90;
+				img.height = 90;
+				img.className = "object-fit-cover";
+				div.appendChild(img);
+				
+				
+				
+				const button = document.createElement("button");
+				button.type = "button";
+		        button.className = "position-absolute top-0 end-0";
+				button.ariaLabel = "Close";
+				button.style.border = "none";
+				button.style.backgroundColor = "transparent";
+				button.style.padding = 0;
+				button.style.paddingTop = "5px";				
+				button.style.margin = 0;
+				div.appendChild(button);
+			
+				const i = document.createElement("i");
+				i.className = "bi bi-x-circle";
+				i.style.color = "white";
+				button.appendChild(i);
+				
+				const img2 = document.createElement("img");
+				img2.src = e.target.result;
+				img2.className = "d-block w-100";
+				img2.style.height = "302px";
+				div2.appendChild(img2);
+				
+			
+				let childe_nodes = document.querySelector("#carouselView").childNodes;
+				console.log(childe_nodes[0]);
+				
+				button.onclick = function() {
+					document.querySelector("#imageView").removeChild(this.parentNode);
+					console.log(index);
+					console.log(childe_nodes[index]);
+					document.querySelector("#carouselView").removeChild(childe_nodes[index]);
+					
+				}
+				
+				document.querySelector("#imageView").appendChild(div);
+				document.querySelector("#carouselView").appendChild(div2);
+			
+				
+			}
+		})
+	}
+	
+	// textarea 글자수 체크
+	document.querySelector("#content").addEventListener("keyup", function(e){
+		var content = e.target.value;
+		console.log(content);
+		document.querySelector("#textLengthCheck").textContent = content.length;
+		
+		if(content.length == 300){
+			window.alert("최대 300자까지 입력 가능합니다.")
+		}
+	});
+
+</script>
+<script>
+		// 메세지 입력, 등록 ajax 
+		document.querySelector("#msg").addEventListener("change", function(e){
+			//console.log(e);
+			if(!e.target.value.trim())
+				return;
+			
+			const roomId = e.target.dataset.roomId;
+			fetch("/direct/api/" + roomId, {
+				method : "post",
+				headers : {
+					"Content-type" : "application/x-www-form-urlencoded"
+				},
+				body : "body="+e.target.value
+			}).then(function(response){
+				return response.json();
+			}).then(function(obj){
+				console.log(obj);
+				if(obj.result){
+					e.target.value="";
+					//location.reload();
+				}
+			});
+		});
+</script>
+<script>
+		var accountId = document.querySelector("#chat");
+		console.log('로그인 계정 :: '+accountId.dataset.accountId);
+			
+		const roomId = document.querySelector("#room").dataset.roomId;
+		
+		const client = new StompJs.Client({
+			brokerURL : "ws://" + location.host + "/eclipse/direct/message",
+			onConnect : function() {
+				client.subscribe("/chat/"+roomId, function(message) {
+					var obj = JSON.parse(message.body);
+					if(obj.type==="newMessage"){
+						
+						const div = document.createElement("div");
+						div.id = obj.data.id;
+						// 로그인 계정일경우 오른쪽...
+						const span1 = document.createElement("span");
+						const span2 = document.createElement("span");
+						
+						if(accountId.dataset.accountId == obj.data.account.id){
+							div.className="text-end mb-2 mt-2";
+							span2.style.backgroundColor = "rgb(55, 151, 240)";
+							span2.style.color ="white";
+							span2.style.padding ="6px";
+							span2.style.display ="inline-block";
+							span2.className ="rounded-2"
+						}else{	
+							div.className="text-start mb-2 mt-2";
+							span2.style.backgroundColor = "rgb(239, 239, 239)";
+							span2.style.padding ="6px";
+							span2.style.display ="inline-block";
+							span2.className ="rounded-2"
+						}
+						
+						span1.className = "text-secondary";
+						span1.style.fontSize = "10px";
+						span1.innerHTML="(" + obj.data.sentAt.split("T")[1].substr(0,5)+") ";
+						
+						
+						span2.innerHTML = obj.data.content;
+						
+						div.append(span1,span2);
+						
+						document.querySelector("#messages").append(div);
+						document.querySelector("#messages").scrollTop
+										= document.querySelector("#messages").scrollHeight;
+						
+						
+					}
+				});
+			}
+		});
+		
+		client.activate();
+		
+</script>
+</body>
+</html>

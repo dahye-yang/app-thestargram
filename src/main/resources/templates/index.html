@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{template::head('TheStargram')}">
+</head>
+<body th:replace="~{template::body(view=~{::view}, script=~{::script})}">
+		<!-- 사이드바 고정 -->
+		<!-- 스토리 및 게시물 -->
+		<div th:fragment="view"
+			style="width: 630px;margin:auto;" class="d-flex justify-content-center">
+			<div style="width: 630px; margin-top:16px;margin-left:378px;">
+				<div style="width: 640px; padding-left: 30px">
+					<ul class="ulLine" style="overflow-x : auto; white-space: nowrap;height: 100px;max-height: 100px; display: flex;">
+						<li>
+							<div class="d-flex flex-column" style="width: 56px">								
+								<div class="rounded-circle" style=" cursor: pointer; overflow: hidden">
+									<img alt="프로필사진" th:src="@{/static/nav/더미프로필.jpg}" style="width: 56px; height: 56px;object-fit: cover;">
+								</div>
+								<div style="text-align: center; cursor: pointer;font-size: 11px; margin-top: 5px" th:text="da_hye.y"></div>							
+							</div>
+						</li>
+						<!-- dummy data -->
+						<li>
+							<div class="d-flex flex-column" style="width: 56px">								
+								<div class="rounded-circle" style=" cursor: pointer; overflow: hidden">
+									<img alt="프로필사진" th:src="@{/static/nav/기본프로필.png}" style="width: 56px; height: 56px;
+										object-fit: cover;">
+								</div>
+								<div style="text-align: center; cursor: pointer;font-size: 11px; margin-top: 5px" th:text="da_hye.y"></div>							
+							</div>
+						</li>
+					</ul>
+				</div>
+				<!-- 게시물 -->
+				<div style="width: 100%">
+					<div style="width: 468px; max-width: 468px;margin: auto;" th:data-post="${posts}" id="posttt">
+					<!-- 게시물 반복문 여기부터 -->
+					<th:block th:if="${posts == null}">
+						<div th:text="|팔로우를 하여 다양한 친구들의 게시물을 즐겨보세요 :)|"></div>
+					</th:block>
+					<th:block th:each="one : ${posts}">
+						<div class="d-flex flex-column gap-2 mb-3" th:with="postNumber=${one.post.id}" >
+							<!-- 게시글 작성자 -->
+							<div class="d-flex justify-content-between">
+								<div class="d-flex justify-content-start align-items-center gap-2">
+									<div class="rounded-circle" style="cursor: pointer; overflow: hidden;" >
+										<img alt="프로필사진" th:src="@{${one.profile.profileImageUrl}}" style="width: 32px; height: 32px; object-fit: cover;"
+												th:onclick="|location.href='@{/{username}(username = ${one.profile.account.username})}'|" >
+									</div>
+									<div th:text="${one.post.account.username}" style="font-size: 13px; font-weight: bold;"></div>
+									<div th:text="${one.post.writedAt}" style="font-size: 13px"></div>
+								</div>
+								<div>
+									<i class="bi bi-three-dots" data-bs-toggle="modal" data-bs-target="#more" style="cursor: pointer;"></i>
+								</div>
+							</div>
+							<!-- 게시물 사진 -->
+							<th:block th:if="${one.images.size != 1}" >
+								<div th:id="|postSlide${postNumber}|" class="carousel slide" style="height: 585px">
+								<!-- images 반복문 -->							
+							  		<div class="carousel-inner" style=" max-height: 585px">
+							  		<th:block th:each="two : ${one.images}">
+							    		<div class="carousel-item" th:classappend="${twoStat.first ? 'active': ''}">
+							    			<img alt="게시물사진" th:src="@{/static{image}(image = ${two.postImageUrl})}" 
+													style="width: 468px; height: 585px; overflow: hidden;">
+										</div>								
+							  		</th:block>
+									</div>							
+									  <button class="carousel-control-prev" type="button" th:data-bs-target="|#postSlide${postNumber}|" data-bs-slide="prev">
+									    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+									    <span class="visually-hidden">Previous</span>
+									  </button>
+									  <button class="carousel-control-next" type="button" th:data-bs-target="|#postSlide${postNumber}|" data-bs-slide="next">
+									    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+									    <span class="visually-hidden">Next</span>
+									  </button>								
+								</div>
+								
+							</th:block>
+							<th:block th:if="${one.images.size == 1}">
+								<div class="rounded-2">
+									<img alt="게시물사진" th:src="@{/static{image}(image = ${one.images[0].postImageUrl})}" 
+														style="width: 468px; height: 585px; overflow: hidden;">
+								</div>							
+							</th:block>
+							<!-- 게시물 글 -->
+							<div>
+								<div class="d-flex justify-content-between align-items-center">
+									<div class="d-flex justify-content-start align-items-center">
+										<!-- 좋아요.. 수정필요  -->
+										<th:block th:each="like : ${like}">
+											<div style="width: 40px; height: 40px;">
+												<i class=" ${one.post.id == like.post.id} ? 'bi bi-suit-heart-fill' : 'bi bi-suit-heart'" 
+														style="font-size:22px;width: 24px; height: 24px; cursor: pointer;" id="heart"></i>
+											</div>											
+										</th:block>
+										<!-- 댓글 아이콘-->
+										<div style="width: 40px; height: 40px;cursor: pointer;" data-bs-toggle="modal"  th:data-bs-target="|#postmodal${one.post.id}|"
+												th:id="|ballon${one.post.id}|">
+											<i class="bi bi-chat" style="font-size:22px;width: 24px; height: 24px"></i>
+										</div>
+										<div style="width: 40px; height: 40px;">
+											<i class="bi bi-send" style="font-size:22px;width: 24px; height: 24px"></i>
+										</div>
+									</div>
+									<div>
+										<img alt="저장" th:src="@{/static/nav/저장.png}" style="width: 24px; height: 24px">
+									</div>
+								</div>
+								<div style="display: none; font-size: 14px" th:data-postNumber="${postNumber}">
+									좋아요 <span id="like">0</span>개
+									<form th:action="@{/add/like}" method="post" id="postLikeForm" name="postLikeForm" onsubmit="changeProfile(); return false;">
+										<input type="hidden" name="postId" th:value="${one.post.id}" />
+									</form>
+								</div>
+								<div>
+									<div th:text="${one.post.account.username}" style="font-size: 14px; font-weight: bold;"></div>
+									<div th:text="${one.post.content}"></div>
+								</div>
+								<!-- index main에서 댓글 달기 -->
+								<div style="height: 100%; " > 			
+			        				<input type="hidden" name="postId" th:value="${one.post.id}"/>
+					        		<div class="d-flex justify-content-between align-items-center maintt" th:data-postid="${one.post.id}" th:data-username="${one.post.account.username}" 
+					        					th:id="|mainAddComment${one.post.id}|">	
+					        			<div class="" th:data-post-mainid="${one.post.id}" >
+					        				<input type="text" th:placeholder="|댓글 달기...|" class="form-control input" name="content" th:id="|mainContent${one.post.id}|"
+					        							style="padding-left: 0px;width: 22vw; font-size: 14px; border: none;box-shadow: none;" autocomplete="off" />
+					        			</div>
+				        				<div style="font-size: 14px" class="text-center">
+				        					<span th:text="게시" style="font-weight: bold;color: rgb(0, 149, 246); cursor: pointer;display: none" class="span"
+				        							th:data-post-idd="${one.post.id}"  th:data-usernamee="${one.post.account.username}" th:id="|mainAddComment${one.post.id}|"></span>
+				        				</div>
+				        			</div>									        		
+			        			</div>
+							</div>
+							
+							<!-- 게시물 더보기 Modal -->
+								<div class="modal fade" th:id="|postmodal${one.post.id}|"  tabindex="-1" th:aria-labelledby="|postmodal${one.post.id}|" aria-hidden="true">
+								  <div class="modal-dialog modal-dialog-centered modal-xl" style="width: 100vw">
+								    <div class="modal-content" style="height: 60vh;">
+								      <div class="modal-body" style="padding: 0px">
+								        <div class="d-flex" style="width: 100%; height: 100%">
+								        	<!-- 사진 -->
+								   			<div style="width: 60%; height: 543px;">									        	
+									        	<div id="carouselExampleIndicators" class="carousel slide" style="width: 100%; height: 100%">
+													  <div class="carousel-inner" style="height: 100%" th:if="${not #lists.isEmpty(posts)}">			
+												  	  		<th:block th:each="postImage : ${one.images}">
+												  	  			<div th:class="${postImageStat.first} ? 'carousel-item active' : 'carousel-item'" style="height: 100%">					     		
+													     		 	<img th:src="@{/static{imageUrl}(imageUrl = ${postImage.postImageUrl})}" class="d-block w-100 h-100" th:alt="사진" style="max-height: 850px">					  	    	
+														  	    </div>
+												  	  		</th:block>										  	  	
+													  </div>  
+													  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+													    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+													    <span class="visually-hidden">Previous</span>
+													  </button>
+													  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+													    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+													    <span class="visually-hidden">Next</span>
+													  </button>							        		
+												</div>
+								        	</div>
+								        	<!-- 댓글 div -->
+								        	<div style="width: 40%; height: 540px">
+								        		<div class="d-flex flex-column">
+								        			<div class="d-flex justify-content-between align-items-center" style="height: 60px;">
+														<div class="d-flex justify-content-start align-items-center gap-2">						
+															<div style="cursor: pointer; padding-top: 14px;padding-bottom: 14px;padding-left: 16px;padding-right: 4px" >
+																<img class="rounded-circle" alt="프로필사진" th:src="@{${one.profile.profileImageUrl}}" style="overflow: hidden;width: 32px; height: 32px; object-fit: cover;">
+															</div>
+															<div th:text="${one.profile.account.username}" style="font-size: 13px; font-weight: bold;"></div>
+														</div>
+														<div style="padding-right: 4px">
+															<i class="bi bi-three-dots"  style="padding: 8px"></i>
+														</div>
+													</div>
+								        			<hr style="margin: 0px"/>
+								        			<!-- 댓글 나열 div -->
+								        			<div style="position: relative; height: 38vh" id="commentList">
+								        			<!-- /////// 댓글 유무에 따른 화면 다르게 하기.... -->
+								        				<ul style="overflow-y: scroll; position: absolute;padding: 16px; scrollbar-width: none;vertical-align: baseline;max-height: 38vh">
+								        					<li style="width: 100%; padding-bottom: 16px">
+								        						<div class="d-flex justify-content-start gap-3"> 							
+							        								<div style="cursor: pointer;" >
+																		<img class="rounded-circle" alt="프로필사진" th:src="@{${one.profile.profileImageUrl}}" style="overflow: hidden;width: 32px; height: 32px; object-fit: cover;">
+																	</div>	        							
+							        								<div class="d-flex flex-column" style="font-size: 12px; text-align: left">					      							
+						        										<div th:text="${one.profile.account.username}" style="font-weight: bold;"></div>
+						        										<div th:text="${one.post.content}"></div>						        									
+							        									<div th:text="${one.post.writedAt}" style="font-weight:bold;color: #B4B4B8"></div>
+							        								</div>
+								        						</div>
+								        					</li>
+								        					<!-- comment(댓글) 불러오기 -->
+								        					<th:block th:each="comment : ${comments}">
+								        						<th:block th:if="${one.post.id == comment.comments.post.id}">
+								        							<li style="width: 100%; padding-bottom: 16px">
+										        						<div class="d-flex justify-content-start gap-3"> 							
+									        								<div style="cursor: pointer;" >
+																				<img class="rounded-circle" alt="댓글단프로필사진" th:src="@{${comment.profiles.profileImageUrl}}" style="overflow: hidden;width: 32px; height: 32px; object-fit: cover;">
+																			</div>	        							
+									        								<div class="d-flex flex-column" style="font-size: 12px; text-align: left">					      							
+								        										<div th:text="${comment.comments.account.username}" style="font-weight: bold;"></div>
+								        										<div th:text="${comment.comments.commentContent}"></div>						        									
+									        									<div th:text="${comment.comments.writedAt}" style="font-weight:bold;color: #B4B4B8"></div>
+									        								</div>
+										        						</div>
+										        					</li>
+								        						</th:block>
+								        					</th:block>							        	
+								        				</ul>
+								        			</div>	        			
+								        			<div class="d-flex justify-content-between align-items-center" style="margin-left: 10px; margin-right: 10px">
+														<div class="d-flex justify-content-start align-items-center">
+															<div style="width: 40px; height: 40px;">
+																<i class="bi bi-suit-heart" style="font-size:22px;width: 24px; height: 24px; cursor: pointer;" id="heart"></i>
+															</div>
+															<div style="width: 40px; height: 40px;">
+																<i class="bi bi-chat" style="font-size:22px;width: 24px; height: 24px"></i>
+															</div>
+															<div style="width: 40px; height: 40px;">
+																<i class="bi bi-send" style="font-size:22px;width: 24px; height: 24px"></i>
+															</div>
+														</div>
+														<div>
+															<img alt="저장" th:src="@{/static/nav/저장.png}" style="width: 24px; height: 24px">
+														</div>
+													</div>	
+													<div class="d-flex flex-column" style="text-align: left">			
+									        			<div style="font-size: 13px; margin-left: 10px">
+									        				<span >0</span>명이 좋아합니다
+									        			</div>
+									        			<div style="font-size: 10px; margin-left: 10px;color: #7D7C7C">
+									        				<!-- 이 게시물의 날짜로 수정 -->
+									        				<span th:text="${one.post.writedAt}"></span>
+									        			</div>
+								        			</div>        
+								        			<hr style="margin-top:7px; margin-bottom:7px"/>
+								        			<!-- 댓글달기 Form -->
+								        			<div style="height: 100%"> 			
+								        				<input type="hidden" name="postId" th:value="${one.post.id}"/>
+										        		<div class="d-flex justify-content-between align-items-center" th:data-postid="${one.post.id}" th:data-username="${one.post.account.username}" id="postIdDataset">	
+										        			<div th:data-postid="${one.post.id}" class="tt">
+										        				<input type="text" th:placeholder="|댓글 달기...|" class="form-control" name="content" th:id="|content${one.post.id}|"
+										        							style="width: 20vw; font-size: 14px; border: none;box-shadow: none;" autocomplete="off"/>
+										        			</div>
+									        				<div style="padding-right: 10px; font-size: 14px">
+									        					<span th:text="게시" style="font-weight: bold;color: rgb(0, 149, 246); cursor: pointer;"
+									        							th:data-post-id="${one.post.id}"  th:data-username="${one.post.account.username}" th:id="|addComment${one.post.id}|"></span>
+									        				</div>
+									        			</div>									        		
+								        			</div>
+								        		</div>
+								        	</div>
+								        </div>
+								      </div>
+								    </div>
+								  </div>
+								</div>
+						</div>
+						<hr/>
+					</th:block>
+					
+					</div>	
+				</div>
+			</div>
+			
+			<!-- 친구 추천..? -->
+			<div style="width: 383px; height: 100vh; padding-left: 64px; margin-top:36px">
+				<div class="d-flex flex-column" style="width: 319px">
+					<div class="d-flex justify-content-between align-items-center" style="padding-right: 16px; padding-left: 16px;font-size: 14px">
+						<div class="d-flex justify-content-start align-items-center gap-2">
+							<div class="rounded-circle" style="overflow: hidden;">
+								<img alt="프로필사진" th:src="@{${myprofile}}" style="width: 44px; height: 44px; cursor: pointer;"
+										th:onclick="|location.href='@{/{username}(username = ${myaccount.username})}'|">
+							</div>
+							<div class="d-flex flex-column" >
+								<div th:text="${myaccount.username}" th:onclick="|location.href='@{/{username}(username = ${myaccount.username})}'|" style="cursor: pointer;font-weight: bold;"></div>
+								<div th:text="${myaccount.name}"></div>								
+							</div>
+						</div>
+					</div>
+					<div class="d-flex justify-content-between mt-4 mb-4" style="font-size: 14px; font-weight: bold;">
+						<div style="padding-right: 16px; padding-left: 16px; color: #A9A9A9" th:text="|회원님을 위한 추천|"></div>
+						<div th:text="모두보기" style="font-size: 12px; padding-right: 10px; cursor: pointer;" th:onclick="|location.href='@{/people}'|"></div>					
+					</div>
+					<div class="d-flex flex-column gap-3">
+						<!-- 랜덤 반복문 -->
+						<th:block th:each="one : ${profiles}">
+							<div class="d-flex justify-content-between align-items-center" style="padding-right: 16px; padding-left: 16px;font-size: 14px">
+								<div class="d-flex justify-content-start align-items-center gap-2">
+									<div class="rounded-circle" style="overflow: hidden;">
+										<img alt="프로필사진" th:src="@{${one.profileImageUrl}}" style="width: 44px; height: 44px; cursor: pointer;"
+											th:onclick="|location.href='@{/{username}(username = ${one.account.username})}'|">
+									</div>
+									<div class="d-flex flex-column" >
+										<div th:text="${one.account.username}" th:onclick="|location.href='@{/{username}(username = ${one.account.username})}'|" style="cursor: pointer;"></div>
+										<div th:text="${one.account.name}"></div>								
+									</div>
+								</div>
+								<div th:text="팔로우" style="color: rgb(0, 149, 246); cursor: pointer; font-weight: bold;font-size: 13px"
+									th:onclick="|location.href='@{/add/follow(accountId = ${one.account.id})}'|"></div>
+							</div>
+						</th:block>
+					</div>
+				</div>
+			</div>
+			<!-- 게시물 메뉴더보기 Modal -->
+			<div class="modal fade" id="more" tabindex="-1" aria-labelledby="profile" aria-hidden="true">
+			  <div class="modal-dialog modal-dialog-centered">
+			    <div class="modal-content" style="width: 400px;height: 155px">
+			      <div class="modal-body d-flex flex-column" style="padding:0px; height: 160px">
+			      	<div>
+			      		<button type="button" class="btn btn-white" th:text="|팔로우 취소|" style="color: rgb(237, 73, 86); width: 100%;height:50px;font-size:14px;font-weight:bold; 
+			      				border-bottom: 1px solid #dee2e6; border-radius: 0px"></button>
+			      	</div>
+			      	<div>
+			      		<button class="btn btn-white" th:text="|링크 복사|" style= "width: 100%;height:50px;font-size:14px;font-weight:bold; border-bottom: 1px solid #dee2e6; border-radius: 0px"
+			      			onclick="clip()"></button>
+			      	</div>
+			      	<div>
+			      		<button class="btn btn-white" th:text="|취소|" data-bs-dismiss="modal"
+			      					style="width: 100%;height:50px;font-size:14px;font-weight:bold;border-radius: 0px"></button>
+			      	</div>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+		</div>
+	
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script th:fragment="script">
+
+	var tt = document.querySelector("#posttt");
+	
+	// 게시물이 있다면 진행
+	if(tt.dataset.post){
+		
+		// 게시글 메인인덱스 댓글 추가
+		var $div2 = document.querySelectorAll(".maintt");
+		
+		for(i =0; i< $div2.length ; i++){
+					
+			$div2[i].querySelector(".input").addEventListener("input", function(evt){
+				const $root = evt.target.parentElement.parentElement;
+				// console.log( evt.target);
+				// console.log( evt.target.parentElement);
+				if(evt.target.value) 
+					$root.querySelector(".span").style.display = 'block';
+				else 
+					$root.querySelector(".span").style.display = 'none';
+			});
+
+			$div2[i].querySelector(".span").addEventListener("click", function(ev) {
+				//console.log(ev.target.dataset);
+				//console.log(ev.target.parentElement.previousElementSibling.childNodes[1].value);
+				//const $root2 = ev.target.parentElement.parentElement;
+				
+				
+				let testData = {
+					'content' : ev.target.parentElement.previousElementSibling.childNodes[1].value,
+					'postid' : ev.target.dataset.postIdd,
+					'username' : ev.target.dataset.usernamee
+				};
+				
+				fetch("/add/comment/api", {
+					method : "POST",
+					headers: {
+						"Content-Type" : "application/json",
+					},
+					body : JSON.stringify(testData)
+				}).then(function(response){
+					return response.text();
+				}).then(function(obj){
+					if(obj == "success"){
+						location.reload();
+						
+					}
+				});
+				
+				ev.target.parentElement.previousElementSibling.childNodes[1].value ='';
+			});
+		}
+		
+
+		// 게시글 디테일 모달 댓글 추가
+		var $div = document.querySelectorAll(".tt");
+		
+		for(i =0; i< $div.length ; i++){
+			document.querySelector("#addComment"+$div[i].dataset.postid).addEventListener("click", function(e){
+		
+				//console.log('데이터셋 :: '+$div.dataset.postid);
+				//테스트용 객체 생성
+			
+					let testData = {
+						'content' : document.querySelector("#content"+e.target.dataset.postId).value,
+						'postid' : e.target.dataset.postId,
+						'username' : e.target.dataset.username
+					};
+					
+					fetch("/add/comment/api", {
+						method : "POST",
+						headers: {
+							"Content-Type" : "application/json",
+						},
+						body : JSON.stringify(testData)
+					}).then(function(response){
+						return response.text();
+					}).then(function(obj){
+						if(obj == "success"){
+							location.reload();
+						}
+					});
+					
+					document.querySelector("#content").value ='';
+					
+					
+				});
+			
+				// 좋아요 눌렀을 때
+				document.querySelector("#heart").addEventListener("click", function(e){
+					console.log('하트클릭');
+					if(e.target.className === "bi bi-suit-heart"){
+						
+						e.target.className = "bi bi-suit-heart-fill";
+					}else{
+						
+						e.target.className = "bi bi-suit-heart";			
+					}
+					
+					document.postLikeForm.submit();
+				});
+				
+				// 링크 복사하기
+				function clip(){
+				   let nowUrl = window.location.href;
+				   var url = '';
+				   var textarea = document.createElement("textarea");
+				   document.body.appendChild(textarea);
+				   url = 'window.location.href';
+				   textarea.value = url;
+				   textarea.select();
+				   document.execCommand("copy");
+				   document.body.removeChild(textarea);
+				   alert("링크가 복사되었습니다. 필요하신 곳에 붙여넣기 하세요!")
+				   //document.querySelector("#more").modal('hide');
+				};
+				
+				//document.querySelector("#mainContent").addEventListener("input", function(e){
+					//document.querySelector("#mainAddComment").display = 'block';
+					//console.log(document.querySelector("#mainAddComment").display);
+				//	console.log('메인컨텐츠 변경?');
+				//});
+		}
+	}
+</script>
+
+</body>
+</html>

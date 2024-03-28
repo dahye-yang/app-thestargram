@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Thestargram :: 회원가입</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+<style type="text/css">
+a:link {color: black; text-decoration: none;}
+a:visited {color: black; text-decoration: none;}
+a:hover {color: black; text-decoration: none;}
+a:active {color: black; text-decoration: none;}
+
+</style>
+</head>
+<body>
+	
+	<div class="container d-flex justify-content-center align-items-center">
+		<div class="d-flex flex-column">
+			<div style="border: 1px solid #C7C8CC; width: 400px; height: 580px; max-height: 800px" class="mt-5">
+				<div class="mt-5 mb-3 text-center">
+					<img alt="더스타그램" th:src="@{/static/logo.png}" style="width: 174px; height: 60px; cursor: pointer;" th:onclick="|location.href='@{/accounts/signin}'|">
+				</div>
+				<div th:text="|친구들의 사진과 동영상을 보려면 가입하세요.|" style="font-weight: bold;" class="text-center"></div>
+				<form th:action="@{/accounts/signup}" method="post">
+					<div class="mt-3">				
+						<div class="form-floating input-group" style="margin: 0 40px 6px;width: 320px ">
+						  <input type="email" class="form-control" id="email"  placeholder="name@example.com"
+						  		 th:field="${newAccount.email}" th:errorclass="is-invalid" aria-describedby="emailCheck">
+						  <label for="email" style="font-size: 13px">이메일 주소입력</label>
+						  <span class="input-group-text" id="emailCheckFail" style="display: none; padding-top: 15px; color: red"><i class="bi bi-x-circle"></i></span>
+						  <span class="input-group-text" id="emailCheckSuccess" style="display: none; padding-top: 15px; color: green"><i class="bi bi-check-circle"></i></span>
+						  <span class="text-danger" th:if="${#fields.hasErrors('newAccount.email')}" style="font-size: 13px">
+						   			* 이메일 형식의 입력이 필요합니다.</span>
+						</div>						
+						<div class="form-floating input-group" style="margin: 0 40px 6px; width: 320px">
+						  <input type="text" class="form-control" id="name"  placeholder="Name" th:field="${newAccount.name}" 
+						  			th:errorclass="is-invalid" aria-describedby="nameCheck">
+						  <label for="name" style="font-size: 13px">성명</label>
+						    <span class="input-group-text" id="nameCheckFail" style="display: none; padding-top: 15px; color: red"><i class="bi bi-x-circle"></i></span>
+						    <span class="input-group-text" id="nameCheckSuccess" style="display: none; padding-top: 15px; color: green"><i class="bi bi-check-circle"></i></span>
+						    <span class="text-danger" id="nameCheckMessage" style="font-size: 13px; display: none"
+		              		>* 최소 1글자 ~ 최대 15글자 사이의 성명이 필요합니다.</span>
+						</div>
+						<div class="form-floating input-group" style="margin: 0 40px 6px;width: 320px">
+						  <input type="text" class="form-control" id="username"  placeholder="username"
+						  	 th:field="${newAccount.username}" th:errorclass="is-invalid" aria-describedby="usernameCheck">
+						  <label for="username" style="font-size: 13px">사용자 이름</label>
+						  <span class="input-group-text" id="usernameCheckFail" style="display: none; padding-top: 15px; color: red"><i class="bi bi-x-circle"></i></span>
+						  <span class="input-group-text" id="usernameCheckSuccess" style="display: none; padding-top: 15px; color: green"><i class="bi bi-check-circle"></i></span>
+						  <span class="text-danger" th:if="${#fields.hasErrors('newAccount.username')}" style="font-size: 13px"
+		              		>* 사용자 이름은 반드시 입력해야합니다.</span>
+						 
+						</div>
+						<div class="form-floating input-group" style="margin: 0 40px 6px;width: 320px">
+						  <input type="password" class="form-control" id="password"  placeholder="Password" name="password"
+						  	 th:field="${newAccount.password}" th:errorclass="is-invalid">
+						  <label for="password" style="font-size: 13px">비밀번호</label>
+						  <span class="input-group-text" id="passwordCheckFail" style="display: none; padding-top: 15px; color: red"><i class="bi bi-x-circle"></i></span>
+						  <span class="input-group-text" id="passwordCheckSuccess" style="display: none; padding-top: 15px; color: green"><i class="bi bi-check-circle"></i></span>
+						  <span class="text-danger" id="passwordCheckMessage" style="font-size: 13px; display: none"
+		              		>* 최소 4글자 ~ 최대 12글자 사이의 비밀번호 입력이 필요합니다.</span>
+						</div>
+					</div>
+					<div style="margin: 19px 40px 6px; font-size: 14px"
+						th:text="|저희 서비스를 이용하는 사람이 회원님의 연락처 정보를 Thestagram에 업로드했을 수도 있습니다.|"></div>
+					<div style="margin: 20px 40px 6px;">
+						<button type="submit" class="btn btn-primary form-control" th:text="가입" 
+							style="font-weight: bold; font-size: 14px" id="joinButton" disabled></button>
+					</div>
+				</form>		
+			</div>
+			<div class="d-flex justify-content-center align-items-center gap-2 mt-2" 
+					style="border: 1px solid #C7C8CC; width: 400px; height: 65px; font-size: 14px">
+				<div th:text="|계정이 있으신가요?|"></div>
+				<div>
+					<a style="color: #77A7FF; font-weight: bold;" th:href="@{/accounts/signin}">로그인</a>									
+				</div>
+			</div>				
+		</div>
+	</div>
+	
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+	let joinButton = document.querySelector("#joinButton");
+	let cnt = 0;
+	
+	let isUsernamevalid = false;
+	let isEmailVaild = false;
+	
+	let emailCheckFail = document.querySelector("#emailCheckFail");
+	let emailCheckSuccess = document.querySelector("#emailCheckSuccess");
+	let usernameCheckFail = document.querySelector("#usernameCheckFail");
+	let usernameCheckSuccess = document.querySelector("#usernameCheckSuccess");
+	
+	// email vaildation check
+	document.querySelector("#email").addEventListener("input", function(e){
+		// 입력한 이메일
+		const inputEmail = e.target.value;
+	
+		fetch("/accounts/api/email/"+inputEmail, {
+			method : "get"
+		}).then(function(response){
+			return response.json();
+		}).then(function(obj){
+			//console.log(obj);
+			if(!obj.result){
+				emailCheckFail.style.display = 'block';
+			}else{
+				emailCheckFail.style.display = 'none';
+				emailCheckSuccess.style.display= 'block';
+				cnt +=1;
+				
+			}
+			if(inputEmail == ''){
+				emailCheckFail.style.display = 'none';
+				emailCheckSuccess.style.display= 'none';
+				cnt -=1;
+			}
+		})
+		if(cnt >= 4){
+			joinButton.disabled = false;
+		}
+	});
+	
+	// username vaildation check
+	document.querySelector("#username").addEventListener("input", function(e){
+		// 입력한 username
+		const isUsernamevalid = e.target.value;
+		
+		fetch("/accounts/api/username/"+isUsernamevalid, {
+			method : "get"
+		}).then(function(response){
+			return response.json();
+		}).then(function(obj){
+			//console.log(obj);
+			if(!obj.result){
+				usernameCheckFail.style.display = 'block';
+			}else{
+				usernameCheckFail.style.display = 'none';
+				usernameCheckSuccess.style.display = 'block';
+				cnt +=1;
+				
+			}
+			if(isUsernamevalid == ''){
+				usernameCheckFail.style.display = 'none';
+				usernameCheckSuccess.style.display = 'none';
+				cnt -=1;
+			}
+		})
+		if(cnt >= 4){
+			joinButton.disabled = false;
+		}
+	});
+	
+	// name vaildation check
+	let nameCheckFail = document.querySelector("#nameCheckFail");
+	let nameCheckSuccess = document.querySelector("#nameCheckSuccess");
+	let nameCheckMessage = document.querySelector("#nameCheckMessage");
+	
+	document.querySelector("#name").addEventListener("input", function(e){
+		let value = e.target.value;
+		//console.log(value.length);
+		if(value.length >= 16){
+			nameCheckFail.style.display = 'block';
+			nameCheckSuccess.style.display = 'none';
+			nameCheckMessage.style.display = 'block';
+		}else{
+			nameCheckFail.style.display = 'none';
+			nameCheckSuccess.style.display = 'block';
+			nameCheckMessage.style.display = 'none';
+			cnt +=1;
+		
+		}
+		if(value == ''){
+			nameCheckFail.style.display = 'none';
+			nameCheckSuccess.style.display = 'none';
+			cnt -=1;
+		}
+		if(cnt >= 4){
+			joinButton.disabled = false;
+		}
+	});
+
+	// password vaildation check
+	let passwordCheckFail = document.querySelector("#passwordCheckFail");
+	let passwordCheckSuccess = document.querySelector("#passwordCheckSuccess");
+	let passwordCheckMessage = document.querySelector("#passwordCheckMessage")
+	
+	document.querySelector("#password").addEventListener("input", function(e){
+		let value = e.target.value;
+		//console.log(value.length);
+		if(value.length >= 13 || value.length <= 3) {
+			passwordCheckFail.style.display = 'block';
+			passwordCheckSuccess.style.display = 'none';
+			passwordCheckMessage.style.display = 'block';
+		}else{
+			passwordCheckFail.style.display = 'none';
+			passwordCheckSuccess.style.display = 'block';
+			passwordCheckMessage.style.display = 'none';
+			cnt +=1;
+			
+		}
+		if(value == ''){
+			passwordCheckFail.style.display = 'none';
+			passwordCheckSuccess.style.display = 'none';
+			cnt -=1;
+		}
+		if(cnt >= 4){
+			joinButton.disabled = false;
+		}
+	});
+	
+
+	
+
+</script>
+</body>
+</html>
